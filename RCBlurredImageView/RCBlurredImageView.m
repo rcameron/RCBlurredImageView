@@ -28,6 +28,8 @@
 {
   UIImageView   *_imageView;
   UIImageView   *_blurredImageView;
+  
+  BOOL          _userInteractionEnabled;
 }
 
 ////////////////////////////////////////////////////////
@@ -63,6 +65,9 @@
   if ([self class] != [RCBlurredImageView class])
     return;
   
+  // Set user interaction to NO
+  [self setUserInteractionEnabled:NO];
+  
   // Set up regular image
   _imageView = [[UIImageView alloc] initWithImage:_image];
   [self addSubview:_imageView];
@@ -74,6 +79,7 @@
   if (_blurredImageView)
     [self addSubview:_blurredImageView];
 }
+
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
