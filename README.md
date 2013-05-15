@@ -4,6 +4,12 @@
 
 An iOS component that mimics the Yahoo Weather app's blurring effect
 
+## Installation
+
+- Drag the `RCBlurredImageView/RCBlurredImageView` folder into your project
+- Add the **CoreImage** framework to your project
+
+
 ## Usage
 
 Use just like UIImageView:
