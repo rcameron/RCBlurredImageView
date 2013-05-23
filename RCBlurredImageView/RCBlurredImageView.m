@@ -78,6 +78,9 @@
   
   if (_blurredImageView)
     [self addSubview:_blurredImageView];
+  
+  NSLog(@"imageview frame = %@", NSStringFromCGRect(_imageView.frame));
+  NSLog(@"blurred frame = %@", NSStringFromCGRect(_blurredImageView.frame));
 }
 
 
@@ -118,9 +121,11 @@ Description: Returns a Gaussian blurred version of _image
   // get vignette & blurred image
   CIImage *vignetteImage = [vignetteFilter valueForKey:kCIOutputImageKey];
 
-  CGImageRef imageRef = [context createCGImage:vignetteImage fromRect:(CGRect){CGPointZero, _image.size}];
+  CGFloat scale = [[UIScreen mainScreen] scale];
+  CGSize scaledSize = CGSizeMake(_image.size.width * scale, _image.size.height * scale);
+  CGImageRef imageRef = [context createCGImage:vignetteImage fromRect:(CGRect){CGPointZero, scaledSize}];
   
-  return [UIImage imageWithCGImage:imageRef];
+  return [UIImage imageWithCGImage:imageRef scale:[[UIScreen mainScreen] scale] orientation:UIImageOrientationUp];
 }
 
 /*

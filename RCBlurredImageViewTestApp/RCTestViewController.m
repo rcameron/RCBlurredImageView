@@ -79,6 +79,7 @@ CGFloat const kParallaxMax    = 10;   // our background can move 10 pixels up
   CGFloat contentHeight = CGRectGetMaxY(titleLabel.frame) + CGRectGetMinY(titleLabel.frame);
   CGSize contentSize = (CGSize){appFrame.size.width, contentHeight};
   [_scrollView setContentSize:contentSize];
+  [_scrollView setShowsVerticalScrollIndicator:NO];
   
   // Add info label
   UILabel *infoLabel = [[UILabel alloc] initWithFrame:CGRectMake(margin,
