@@ -28,123 +28,75 @@
 {
   UIImageView   *_imageView;
   UIImageView   *_blurredImageView;
-  
-  BOOL          _userInteractionEnabled;
 }
 
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-#pragma mark - Init
-////////////////////////////////////////////////////////
 - (id)initWithImage:(UIImage *)image
 {
-  // Make sure we have an image to work with
-  if (!image)
-    return nil;
+    if (self = [super init])
+    {
+        [self setImage:image];
+    }
   
-  // Calculate frame size
-  CGRect frame = (CGRect){CGPointZero, image.size};
-  
-  self = [super initWithFrame:frame];
-  
-  if (!self)
-    return nil;
-  
-  // Pass along parameters
-  _image = image;
-  
-  [self RCBlurredImageView_commonInit];
-  
-  return self;
+    return self;
+}
+
+- (void)setImage:(UIImage *)image
+{
+    self.bounds = (CGRect){CGPointZero, image.size};
+    _image = image;
+    [self setup];
 }
 
 ////////////////////////////////////////////////////////
-- (void)RCBlurredImageView_commonInit
+- (void)setup
 {
-  // Make sure we're not subclassed
-  if ([self class] != [RCBlurredImageView class])
-    return;
+    // Set up regular image
+    _imageView = [[UIImageView alloc] initWithImage:_image];
+    if (!_imageView.superview)
+        [self addSubview:_imageView];
   
-  // Set user interaction to NO
-  [self setUserInteractionEnabled:NO];
-  
-  // Set up regular image
-  _imageView = [[UIImageView alloc] initWithImage:_image];
-  [self addSubview:_imageView];
-  
-  // Set blurred image
-  _blurredImageView = [[UIImageView alloc] initWithImage:[self blurredImage]];
-  [_blurredImageView setAlpha:0.95f];
-  
-  if (_blurredImageView)
+    // Set blurred image
+    _blurredImageView = [[UIImageView alloc] initWithImage:[RCBlurredImageView blurredImage:_image]];
+    [_blurredImageView setAlpha:0.95f];
     [self addSubview:_blurredImageView];
-  
-  NSLog(@"imageview frame = %@", NSStringFromCGRect(_imageView.frame));
-  NSLog(@"blurred frame = %@", NSStringFromCGRect(_blurredImageView.frame));
 }
 
-
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-#pragma mark - Blur
-////////////////////////////////////////////////////////
-/*
-========================
-- (UIImage *)blurredImage
-Description: Returns a Gaussian blurred version of _image
-========================
-*/
-- (UIImage *)blurredImage
+// Description: Returns a Gaussian blurred version of _image
++ (UIImage *)blurredImage:(UIImage *)img
 {
-  // Make sure that we have an image to work with
-  if (!_image)
-    return nil;
+    // Create context
+    CIContext *context = [CIContext contextWithOptions:nil];
   
-  // Create context
-  CIContext *context = [CIContext contextWithOptions:nil];
+    // Create an image
+    CIImage *image = [CIImage imageWithCGImage:img.CGImage];
   
-  // Create an image
-  CIImage *image = [CIImage imageWithCGImage:_image.CGImage];
-  
-  // Set up a Gaussian Blur filter
-  CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
-  [blurFilter setValue:image forKey:kCIInputImageKey];
+    // Set up a Gaussian Blur filter
+    CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
+    [blurFilter setValue:image forKey:kCIInputImageKey];
     
-  // Get blurred image out
-  CIImage *blurredImage = [blurFilter valueForKey:kCIOutputImageKey];
+    // Get blurred image out
+    CIImage *blurredImage = [blurFilter valueForKey:kCIOutputImageKey];
   
-  // Set up vignette filter
-  CIFilter *vignetteFilter = [CIFilter filterWithName:@"CIVignette"];
-  [vignetteFilter setValue:blurredImage forKey:kCIInputImageKey];
-  [vignetteFilter setValue:@(4.f) forKey:@"InputIntensity"];
+    // Set up vignette filter
+    CIFilter *vignetteFilter = [CIFilter filterWithName:@"CIVignette"];
+    [vignetteFilter setValue:blurredImage forKey:kCIInputImageKey];
+    [vignetteFilter setValue:@(4.f) forKey:@"InputIntensity"];
   
-  // get vignette & blurred image
-  CIImage *vignetteImage = [vignetteFilter valueForKey:kCIOutputImageKey];
+    // get vignette & blurred image
+    CIImage *vignetteImage = [vignetteFilter valueForKey:kCIOutputImageKey];
 
-  CGFloat scale = [[UIScreen mainScreen] scale];
-  CGSize scaledSize = CGSizeMake(_image.size.width * scale, _image.size.height * scale);
-  CGImageRef imageRef = [context createCGImage:vignetteImage fromRect:(CGRect){CGPointZero, scaledSize}];
+    CGFloat scale = [[UIScreen mainScreen] scale];
+    CGSize scaledSize = CGSizeMake(img.size.width * scale, img.size.height * scale);
+    CGImageRef imageRef = [context createCGImage:vignetteImage fromRect:(CGRect){CGPointZero, scaledSize}];
   
-  return [UIImage imageWithCGImage:imageRef scale:[[UIScreen mainScreen] scale] orientation:UIImageOrientationUp];
+    return [UIImage imageWithCGImage:imageRef scale:[[UIScreen mainScreen] scale] orientation:UIImageOrientationUp];
 }
 
-/*
-========================
-- (void)setBlurIntensity
-Description: Changes the opacity on the blurred image to change intensity
-========================
-*/
+// Description: Changes the opacity on the blurred image to change intensity
 - (void)setBlurIntensity:(CGFloat)blurIntensity
 {
-  if (blurIntensity < 0.f)
-    blurIntensity = 0.f;
-  else if (blurIntensity > 1.f)
-    blurIntensity = 1.f;
-  
-  _blurIntensity = blurIntensity;
-  
-  [_blurredImageView setAlpha:blurIntensity];
+    _blurIntensity = MAX(0.f,MIN(1.f,blurIntensity));
+    [_blurredImageView setAlpha:_blurIntensity];
 }
 
-////////////////////////////////////////////////////////
 @end
