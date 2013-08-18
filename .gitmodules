@@ -1,3 +1,6 @@
 [submodule "StackBluriOS"]
 	path = StackBluriOS
 	url = https://github.com/tomsoft1/StackBluriOS
+[submodule "GPUImage"]
+	path = GPUImage
+	url = https://github.com/BradLarson/GPUImage

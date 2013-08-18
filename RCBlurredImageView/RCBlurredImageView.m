@@ -23,7 +23,7 @@
 //
 
 #import "RCBlurredImageView.h"
-#import "UIImage+StackBlur.h"
+#import "GPUImageFastBlurFilter.h"
 
 @implementation RCBlurredImageView
 {
@@ -71,8 +71,10 @@
 // Description: Returns a Gaussian blurred version of _image
 + (UIImage *)blurredImage:(UIImage *)img
 {
-    UIImage * bluredImg = [img stackBlur:20];
-    
+    GPUImageFastBlurFilter * filter = [[GPUImageFastBlurFilter alloc] init];
+    filter.blurPasses = 20;
+    UIImage * bluredImg = [filter imageByFilteringImage:img];
+      
     // Create context
     CIContext *context = [CIContext contextWithOptions:nil];
   
