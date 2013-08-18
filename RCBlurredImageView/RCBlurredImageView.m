@@ -23,6 +23,7 @@
 //
 
 #import "RCBlurredImageView.h"
+#import "UIImage+StackBlur.h"
 
 @implementation RCBlurredImageView
 {
@@ -52,30 +53,31 @@
 {
     // Set up regular image
     _imageView = [[UIImageView alloc] initWithImage:_image];
+    _imageView.frame = self.bounds;
+    _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
+                                | UIViewAutoresizingFlexibleHeight;
     if (!_imageView.superview)
         [self addSubview:_imageView];
   
     // Set blurred image
     _blurredImageView = [[UIImageView alloc] initWithImage:[RCBlurredImageView blurredImage:_image]];
-    [_blurredImageView setAlpha:0.95f];
-    [self addSubview:_blurredImageView];
+    _blurredImageView.frame = self.bounds;
+    _blurredImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
+                                       | UIViewAutoresizingFlexibleHeight;
+    if (!_blurredImageView.superview)
+        [self addSubview:_blurredImageView];
 }
 
 // Description: Returns a Gaussian blurred version of _image
 + (UIImage *)blurredImage:(UIImage *)img
 {
+    UIImage * bluredImg = [img stackBlur:20];
+    
     // Create context
     CIContext *context = [CIContext contextWithOptions:nil];
   
-    // Create an image
-    CIImage *image = [CIImage imageWithCGImage:img.CGImage];
-  
-    // Set up a Gaussian Blur filter
-    CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
-    [blurFilter setValue:image forKey:kCIInputImageKey];
-    
     // Get blurred image out
-    CIImage *blurredImage = [blurFilter valueForKey:kCIOutputImageKey];
+    CIImage *blurredImage = [CIImage imageWithCGImage:bluredImg.CGImage];
   
     // Set up vignette filter
     CIFilter *vignetteFilter = [CIFilter filterWithName:@"CIVignette"];

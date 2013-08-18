@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25F0938417C10E6F00F0891B /* UIImage+StackBlur.m in Sources */ = {isa = PBXBuildFile; fileRef = 25F0938317C10E6F00F0891B /* UIImage+StackBlur.m */; };
 		96EAAF6F173D8EFE00DEB37E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96EAAF6E173D8EFE00DEB37E /* UIKit.framework */; };
 		96EAAF71173D8EFE00DEB37E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96EAAF70173D8EFE00DEB37E /* Foundation.framework */; };
 		96EAAF73173D8EFE00DEB37E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96EAAF72173D8EFE00DEB37E /* CoreGraphics.framework */; };
@@ -24,6 +25,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		25F0938217C10E6F00F0891B /* UIImage+StackBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+StackBlur.h"; path = "StackBluriOS/Classes/UIImage+StackBlur.h"; sourceTree = "<group>"; };
+		25F0938317C10E6F00F0891B /* UIImage+StackBlur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+StackBlur.m"; path = "StackBluriOS/Classes/UIImage+StackBlur.m"; sourceTree = "<group>"; };
 		96EAAF6B173D8EFE00DEB37E /* RCBlurredImageViewTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RCBlurredImageViewTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96EAAF6E173D8EFE00DEB37E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		96EAAF70173D8EFE00DEB37E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -61,9 +64,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		25F0938117C10E2E00F0891B /* StackBluriOS */ = {
+			isa = PBXGroup;
+			children = (
+				25F0938217C10E6F00F0891B /* UIImage+StackBlur.h */,
+				25F0938317C10E6F00F0891B /* UIImage+StackBlur.m */,
+			);
+			name = StackBluriOS;
+			sourceTree = "<group>";
+		};
 		96EAAF62173D8EFE00DEB37E = {
 			isa = PBXGroup;
 			children = (
+				25F0938117C10E2E00F0891B /* StackBluriOS */,
 				96EAAF8C173D8FBF00DEB37E /* RCBlurredImageView */,
 				96EAAF74173D8EFE00DEB37E /* RCBlurredImageViewTestApp */,
 				96EAAF6D173D8EFE00DEB37E /* Frameworks */,
@@ -199,6 +212,7 @@
 				96EAAF7F173D8EFE00DEB37E /* RCAppDelegate.m in Sources */,
 				96EAAF8F173D8FE900DEB37E /* RCBlurredImageView.m in Sources */,
 				96EAAF94173D986800DEB37E /* RCTestViewController.m in Sources */,
+				25F0938417C10E6F00F0891B /* UIImage+StackBlur.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
