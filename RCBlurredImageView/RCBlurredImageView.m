@@ -27,8 +27,9 @@
 
 @implementation RCBlurredImageView
 {
-  UIImageView   *_imageView;
-  UIImageView   *_blurredImageView;
+    UIImageView   *_imageView;
+    UIImageView   *_blurredImageView;
+    UIImageView   *_gradientImageView;
 }
 
 - (id)initWithImage:(UIImage *)image
@@ -43,7 +44,8 @@
 
 - (void)setImage:(UIImage *)image
 {
-    self.bounds = (CGRect){CGPointZero, image.size};
+    CGFloat scale = 1;//[UIScreen mainScreen].scale;
+    self.bounds = CGRectMake(0,0,image.size.width*scale,image.size.height*scale);
     _image = image;
     [self setup];
 }
@@ -53,6 +55,7 @@
 {
     // Set up regular image
     _imageView = [[UIImageView alloc] initWithImage:_image];
+    _imageView.contentMode = UIViewContentModeScaleAspectFit;
     _imageView.frame = self.bounds;
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
                                 | UIViewAutoresizingFlexibleHeight;
@@ -61,11 +64,20 @@
   
     // Set blurred image
     _blurredImageView = [[UIImageView alloc] initWithImage:[RCBlurredImageView blurredImage:_image]];
+    _blurredImageView.contentMode = UIViewContentModeScaleAspectFit;
     _blurredImageView.frame = self.bounds;
     _blurredImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
                                        | UIViewAutoresizingFlexibleHeight;
     if (!_blurredImageView.superview)
         [self addSubview:_blurredImageView];
+    
+    UIImage * gradient = [[UIImage imageNamed:@"gradient"] resizableImageWithCapInsets:UIEdgeInsetsMake(160,160,159,159)];
+    _gradientImageView = [[UIImageView alloc] initWithImage:gradient];
+    _gradientImageView.frame = self.bounds;
+    _gradientImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
+                                        | UIViewAutoresizingFlexibleHeight;
+    if (!_gradientImageView.superview)
+        [self addSubview:_gradientImageView];
 }
 
 + (UIImage *)applyBlur:(UIImage *)image
@@ -124,27 +136,7 @@
 // Description: Returns a Gaussian blurred version of _image
 + (UIImage *)blurredImage:(UIImage *)img
 {
-    UIImage * bluredImg = [RCBlurredImageView applyBlur:img radius:5 times:2];
-    
-    // Create context
-    CIContext *context = [CIContext contextWithOptions:nil];
-  
-    // Get blurred image out
-    CIImage *blurredImage = [CIImage imageWithCGImage:bluredImg.CGImage];
-  
-    // Set up vignette filter
-    CIFilter *vignetteFilter = [CIFilter filterWithName:@"CIVignette"];
-    [vignetteFilter setValue:blurredImage forKey:kCIInputImageKey];
-    [vignetteFilter setValue:@(4.f) forKey:@"InputIntensity"];
-  
-    // get vignette & blurred image
-    CIImage *vignetteImage = [vignetteFilter valueForKey:kCIOutputImageKey];
-
-    CGFloat scale = [[UIScreen mainScreen] scale];
-    CGSize scaledSize = CGSizeMake(img.size.width * scale, img.size.height * scale);
-    CGImageRef imageRef = [context createCGImage:vignetteImage fromRect:(CGRect){CGPointZero, scaledSize}];
-  
-    return [UIImage imageWithCGImage:imageRef scale:[[UIScreen mainScreen] scale] orientation:UIImageOrientationUp];
+    return [RCBlurredImageView applyBlur:img radius:5 times:2];
 }
 
 // Description: Changes the opacity on the blurred image to change intensity
@@ -152,6 +144,7 @@
 {
     _blurIntensity = MAX(0.f,MIN(1.f,blurIntensity));
     [_blurredImageView setAlpha:_blurIntensity];
+    [_gradientImageView setAlpha:_blurIntensity];
 }
 
 @end
