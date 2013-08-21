@@ -22,8 +22,8 @@
 // THE SOFTWARE.Copyright (c) 2013 Rich Cameron. All rights reserved.
 //
 
+#import <Accelerate/Accelerate.h>
 #import "RCBlurredImageView.h"
-#import "GPUImageFastBlurFilter.h"
 
 @implementation RCBlurredImageView
 {
@@ -68,13 +68,64 @@
         [self addSubview:_blurredImageView];
 }
 
++ (UIImage *)applyBlur:(UIImage *)image
+                radius:(CGFloat)blurRadius
+                 times:(int)times
+{
+    CGRect imageRect = { CGPointZero, image.size };
+    UIImage *effectImage = image;
+    
+    UIGraphicsBeginImageContextWithOptions(image.size, NO, 0.0);
+    CGContextRef effectInContext = UIGraphicsGetCurrentContext();
+    CGContextScaleCTM(effectInContext, 1.0, -1.0);
+    CGContextTranslateCTM(effectInContext, 0, -image.size.height);
+    CGContextDrawImage(effectInContext, imageRect, image.CGImage);
+    
+    vImage_Buffer effectInBuffer;
+    effectInBuffer.data     = CGBitmapContextGetData(effectInContext);
+    effectInBuffer.width    = CGBitmapContextGetWidth(effectInContext);
+    effectInBuffer.height   = CGBitmapContextGetHeight(effectInContext);
+    effectInBuffer.rowBytes = CGBitmapContextGetBytesPerRow(effectInContext);
+    
+    UIGraphicsBeginImageContextWithOptions(image.size, NO, 0.0);
+    CGContextRef effectOutContext = UIGraphicsGetCurrentContext();
+    
+    vImage_Buffer effectOutBuffer;
+    effectOutBuffer.data     = CGBitmapContextGetData(effectOutContext);
+    effectOutBuffer.width    = CGBitmapContextGetWidth(effectOutContext);
+    effectOutBuffer.height   = CGBitmapContextGetHeight(effectOutContext);
+    effectOutBuffer.rowBytes = CGBitmapContextGetBytesPerRow(effectOutContext);
+    
+    CGFloat inputRadius = blurRadius * [[UIScreen mainScreen] scale];
+    NSUInteger radius = floor(inputRadius * 3. * sqrt(2 * M_PI) / 4 + 0.5);
+    radius |= 1;
+    
+    for (int i = 0; i < times/2; i++)
+    {
+        vImageBoxConvolve_ARGB8888(&effectInBuffer, &effectOutBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
+        vImageBoxConvolve_ARGB8888(&effectOutBuffer, &effectInBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
+    }
+    
+    if (times % 2 == 1)
+    {
+        vImageBoxConvolve_ARGB8888(&effectInBuffer, &effectOutBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
+        effectImage = UIGraphicsGetImageFromCurrentImageContext();
+    }
+    UIGraphicsEndImageContext();
+    
+    if (times % 2 == 0)
+        effectImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return effectImage;
+}
+
 // Description: Returns a Gaussian blurred version of _image
 + (UIImage *)blurredImage:(UIImage *)img
 {
-    GPUImageFastBlurFilter * filter = [[GPUImageFastBlurFilter alloc] init];
-    filter.blurPasses = 20;
-    UIImage * bluredImg = [filter imageByFilteringImage:img];
-      
+    UIImage * bluredImg = [RCBlurredImageView applyBlur:img radius:5 times:2];
+    
     // Create context
     CIContext *context = [CIContext contextWithOptions:nil];
   
