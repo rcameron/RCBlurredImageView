@@ -144,7 +144,8 @@
 {
     _blurIntensity = MAX(0.f,MIN(1.f,blurIntensity));
     [_blurredImageView setAlpha:_blurIntensity];
-    [_gradientImageView setAlpha:_blurIntensity];
+    //[_gradientImageView setAlpha:_blurIntensity];
+    _gradientImageView.transform = CGAffineTransformMakeScale(3-2*blurIntensity,3-2*blurIntensity);
 }
 
 @end
