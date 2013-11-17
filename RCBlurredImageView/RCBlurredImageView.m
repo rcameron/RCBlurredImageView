@@ -29,7 +29,6 @@
 {
     UIImageView   *_imageView;
     UIImageView   *_blurredImageView;
-    UIImageView   *_gradientImageView;
 }
 
 - (id)initWithImage:(UIImage *)image
@@ -60,8 +59,8 @@
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
                                 | UIViewAutoresizingFlexibleHeight;
     if (!_imageView.superview)
-        [self addSubview:_imageView];
-  
+        [self insertSubview:_imageView atIndex:0];
+    
     // Set blurred image
     _blurredImageView = [[UIImageView alloc] initWithImage:[RCBlurredImageView blurredImage:_image]];
     _blurredImageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -69,15 +68,10 @@
     _blurredImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
                                        | UIViewAutoresizingFlexibleHeight;
     if (!_blurredImageView.superview)
-        [self addSubview:_blurredImageView];
+        [self insertSubview:_blurredImageView atIndex:1];
     
-    UIImage * gradient = [[UIImage imageNamed:@"gradient"] resizableImageWithCapInsets:UIEdgeInsetsMake(160,160,159,159)];
-    _gradientImageView = [[UIImageView alloc] initWithImage:gradient];
-    _gradientImageView.frame = self.bounds;
-    _gradientImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
-                                        | UIViewAutoresizingFlexibleHeight;
-    if (!_gradientImageView.superview)
-        [self addSubview:_gradientImageView];
+    // Need to UI7Kit work properly https://github.com/youknowone/UI7Kit/issues/128
+    self.backgroundColor = [UIColor colorWithPatternImage:_blurredImageView.image];
 }
 
 + (UIImage *)applyBlur:(UIImage *)image
@@ -118,6 +112,17 @@
         vImageBoxConvolve_ARGB8888(&effectOutBuffer, &effectInBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
     }
     
+    
+    CGColorSpaceRef colSp = CGColorSpaceCreateDeviceRGB();
+    CGGradientRef gradient = CGGradientCreateWithColors(colSp, (__bridge CFArrayRef)@[(id)[UIColor colorWithRed:0 green:0 blue:0 alpha:0.3].CGColor, (id)[UIColor colorWithRed:0 green:0 blue:0 alpha:0.9].CGColor], 0);
+    
+    CGContextDrawRadialGradient((times % 2 == 1) ? effectOutContext : effectInContext, gradient,
+                                CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), 0,
+                                CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), imageRect.size.width, 0);
+    
+    CGColorSpaceRelease(colSp);
+    CGGradientRelease(gradient);
+    
     if (times % 2 == 1)
     {
         vImageBoxConvolve_ARGB8888(&effectInBuffer, &effectOutBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
@@ -127,7 +132,6 @@
     
     if (times % 2 == 0)
         effectImage = UIGraphicsGetImageFromCurrentImageContext();
-    
     UIGraphicsEndImageContext();
     
     return effectImage;
@@ -144,7 +148,6 @@
 {
     _blurIntensity = MAX(0.f,MIN(1.f,blurIntensity));
     [_blurredImageView setAlpha:_blurIntensity];
-    [_gradientImageView setAlpha:_blurIntensity*_blurIntensity];
 }
 
 @end
