@@ -118,7 +118,7 @@
     
     CGContextDrawRadialGradient((times % 2 == 1) ? effectOutContext : effectInContext, gradient,
                                 CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), 0,
-                                CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), imageRect.size.width, 0);
+                                CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), ceil(sqrt(imageRect.size.width*imageRect.size.width+imageRect.size.height*imageRect.size.height)/[UIScreen mainScreen].scale), 0);
     
     CGColorSpaceRelease(colSp);
     CGGradientRelease(gradient);
