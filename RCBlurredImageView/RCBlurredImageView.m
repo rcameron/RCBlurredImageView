@@ -103,7 +103,7 @@
     effectOutBuffer.rowBytes = CGBitmapContextGetBytesPerRow(effectOutContext);
     
     CGFloat inputRadius = blurRadius * [[UIScreen mainScreen] scale];
-    NSUInteger radius = floor(inputRadius * 3. * sqrt(2 * M_PI) / 4 + 0.5);
+    uint32_t radius = floor(inputRadius * 3. * sqrt(2 * M_PI) / 4 + 0.5);
     radius |= 1;
     
     for (int i = 0; i < times/2; i++)
