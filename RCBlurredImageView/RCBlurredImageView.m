@@ -62,7 +62,7 @@
     // Set blurred image
     if (_blurredImageView == nil) {
         _blurredImageView = [[UIImageView alloc] initWithImage:[self blurredImage]];
-        _blurredImageView.alpha = 0.95f;
+        _blurredImageView.alpha = 0.f;
         _blurredImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         _blurredImageView.translatesAutoresizingMaskIntoConstraints = YES;
         _blurredImageView.frame = self.bounds;
@@ -83,6 +83,10 @@
     // Make sure that we have an image to work with
     if (!_image)
         return nil;
+    
+    if (_image.scale == 2) {
+        _image = [UIImage imageWithCGImage:_image.CGImage scale:1 orientation:_image.imageOrientation];
+    }
     
     // Create context
     CIContext *context = [CIContext contextWithOptions:nil];
