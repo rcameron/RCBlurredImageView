@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		846D7BB118052B10000767C8 /* gradient@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 846D7BB018052B10000767C8 /* gradient@2x.png */; };
-		846D7BB318052B16000767C8 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 846D7BB218052B16000767C8 /* Accelerate.framework */; };
 		96EAAF6F173D8EFE00DEB37E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96EAAF6E173D8EFE00DEB37E /* UIKit.framework */; };
 		96EAAF71173D8EFE00DEB37E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96EAAF70173D8EFE00DEB37E /* Foundation.framework */; };
 		96EAAF73173D8EFE00DEB37E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96EAAF72173D8EFE00DEB37E /* CoreGraphics.framework */; };
@@ -26,8 +24,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		846D7BB018052B10000767C8 /* gradient@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "gradient@2x.png"; sourceTree = "<group>"; };
-		846D7BB218052B16000767C8 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		96EAAF6B173D8EFE00DEB37E /* RCBlurredImageViewTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RCBlurredImageViewTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96EAAF6E173D8EFE00DEB37E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		96EAAF70173D8EFE00DEB37E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -55,7 +51,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				846D7BB318052B16000767C8 /* Accelerate.framework in Frameworks */,
 				96EAAF91173D94EB00DEB37E /* CoreImage.framework in Frameworks */,
 				96EAAF6F173D8EFE00DEB37E /* UIKit.framework in Frameworks */,
 				96EAAF71173D8EFE00DEB37E /* Foundation.framework in Frameworks */,
@@ -87,7 +82,6 @@
 		96EAAF6D173D8EFE00DEB37E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				846D7BB218052B16000767C8 /* Accelerate.framework */,
 				96EAAF90173D94EB00DEB37E /* CoreImage.framework */,
 				96EAAF6E173D8EFE00DEB37E /* UIKit.framework */,
 				96EAAF70173D8EFE00DEB37E /* Foundation.framework */,
@@ -127,7 +121,6 @@
 		96EAAF8C173D8FBF00DEB37E /* RCBlurredImageView */ = {
 			isa = PBXGroup;
 			children = (
-				846D7BB018052B10000767C8 /* gradient@2x.png */,
 				96EAAF8D173D8FE900DEB37E /* RCBlurredImageView.h */,
 				96EAAF8E173D8FE900DEB37E /* RCBlurredImageView.m */,
 			);
@@ -190,7 +183,6 @@
 				96EAAF81173D8EFE00DEB37E /* Default.png in Resources */,
 				96EAAF83173D8EFE00DEB37E /* Default@2x.png in Resources */,
 				96EAAF85173D8EFF00DEB37E /* Default-568h@2x.png in Resources */,
-				846D7BB118052B10000767C8 /* gradient@2x.png in Resources */,
 				96EAAF97173D9A3300DEB37E /* test.jpg in Resources */,
 				96EAAF98173D9A3300DEB37E /* test@2x.jpg in Resources */,
 			);
