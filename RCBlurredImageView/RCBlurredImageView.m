@@ -22,132 +22,129 @@
 // THE SOFTWARE.Copyright (c) 2013 Rich Cameron. All rights reserved.
 //
 
-#import <Accelerate/Accelerate.h>
 #import "RCBlurredImageView.h"
 
 @implementation RCBlurredImageView
 {
-    UIImageView   *_imageView;
-    UIImageView   *_blurredImageView;
-}
-
-- (id)initWithImage:(UIImage *)image
-{
-    if (self = [super init])
-    {
-        [self setImage:image];
-    }
+  UIImageView   *_imageView;
+  UIImageView   *_blurredImageView;
   
-    return self;
-}
-
-- (void)setImage:(UIImage *)image
-{
-    CGFloat scale = 1;//[UIScreen mainScreen].scale;
-    self.bounds = CGRectMake(0,0,image.size.width*scale,image.size.height*scale);
-    _image = image;
-    [self setup];
+  BOOL          _userInteractionEnabled;
 }
 
 ////////////////////////////////////////////////////////
-- (void)setup
+////////////////////////////////////////////////////////
+#pragma mark - Init
+////////////////////////////////////////////////////////
+- (id)initWithImage:(UIImage *)image
 {
-    // Set up regular image
-    _imageView = [[UIImageView alloc] initWithImage:_image];
-    _imageView.contentMode = UIViewContentModeScaleAspectFit;
-    _imageView.frame = self.bounds;
-    _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
-                                | UIViewAutoresizingFlexibleHeight;
-    if (!_imageView.superview)
-        [self insertSubview:_imageView atIndex:0];
-    
-    // Set blurred image
-    _blurredImageView = [[UIImageView alloc] initWithImage:[RCBlurredImageView blurredImage:_image]];
-    _blurredImageView.contentMode = UIViewContentModeScaleAspectFit;
-    _blurredImageView.frame = self.bounds;
-    _blurredImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth
-                                       | UIViewAutoresizingFlexibleHeight;
-    if (!_blurredImageView.superview)
-        [self insertSubview:_blurredImageView atIndex:1];
-    
-    // Need to UI7Kit work properly https://github.com/youknowone/UI7Kit/issues/128
-    self.backgroundColor = [UIColor colorWithPatternImage:_blurredImageView.image];
+  // Make sure we have an image to work with
+  if (!image)
+    return nil;
+  
+  // Calculate frame size
+  CGRect frame = (CGRect){CGPointZero, image.size};
+  
+  self = [super initWithFrame:frame];
+  
+  if (!self)
+    return nil;
+  
+  // Pass along parameters
+  _image = image;
+  
+  [self RCBlurredImageView_commonInit];
+  
+  return self;
 }
 
-+ (UIImage *)applyBlur:(UIImage *)image
-                radius:(CGFloat)blurRadius
-                 times:(int)times
+////////////////////////////////////////////////////////
+- (void)RCBlurredImageView_commonInit
 {
-    CGRect imageRect = { CGPointZero, image.size };
-    UIImage *effectImage = image;
-    
-    UIGraphicsBeginImageContextWithOptions(image.size, NO, 0.0);
-    CGContextRef effectInContext = UIGraphicsGetCurrentContext();
-    CGContextScaleCTM(effectInContext, 1.0, -1.0);
-    CGContextTranslateCTM(effectInContext, 0, -image.size.height);
-    CGContextDrawImage(effectInContext, imageRect, image.CGImage);
-    
-    vImage_Buffer effectInBuffer;
-    effectInBuffer.data     = CGBitmapContextGetData(effectInContext);
-    effectInBuffer.width    = CGBitmapContextGetWidth(effectInContext);
-    effectInBuffer.height   = CGBitmapContextGetHeight(effectInContext);
-    effectInBuffer.rowBytes = CGBitmapContextGetBytesPerRow(effectInContext);
-    
-    UIGraphicsBeginImageContextWithOptions(image.size, NO, 0.0);
-    CGContextRef effectOutContext = UIGraphicsGetCurrentContext();
-    
-    vImage_Buffer effectOutBuffer;
-    effectOutBuffer.data     = CGBitmapContextGetData(effectOutContext);
-    effectOutBuffer.width    = CGBitmapContextGetWidth(effectOutContext);
-    effectOutBuffer.height   = CGBitmapContextGetHeight(effectOutContext);
-    effectOutBuffer.rowBytes = CGBitmapContextGetBytesPerRow(effectOutContext);
-    
-    CGFloat inputRadius = blurRadius * [[UIScreen mainScreen] scale];
-    uint32_t radius = floor(inputRadius * 3. * sqrt(2 * M_PI) / 4 + 0.5);
-    radius |= 1;
-    
-    for (int i = 0; i < times/2; i++)
-    {
-        vImageBoxConvolve_ARGB8888(&effectInBuffer, &effectOutBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
-        vImageBoxConvolve_ARGB8888(&effectOutBuffer, &effectInBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
-    }
-    
-    
-    CGColorSpaceRef colSp = CGColorSpaceCreateDeviceRGB();
-    CGGradientRef gradient = CGGradientCreateWithColors(colSp, (__bridge CFArrayRef)@[(id)[UIColor colorWithRed:0 green:0 blue:0 alpha:0.3].CGColor, (id)[UIColor colorWithRed:0 green:0 blue:0 alpha:0.9].CGColor], 0);
-    
-    CGContextDrawRadialGradient((times % 2 == 1) ? effectOutContext : effectInContext, gradient,
-                                CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), 0,
-                                CGPointMake(CGRectGetMidX(imageRect),CGRectGetMidY(imageRect)), ceil(sqrt(imageRect.size.width*imageRect.size.width+imageRect.size.height*imageRect.size.height)/[UIScreen mainScreen].scale), 0);
-    
-    CGColorSpaceRelease(colSp);
-    CGGradientRelease(gradient);
-    
-    if (times % 2 == 1)
-    {
-        vImageBoxConvolve_ARGB8888(&effectInBuffer, &effectOutBuffer, NULL, 0, 0, radius, radius, 0, kvImageEdgeExtend);
-        effectImage = UIGraphicsGetImageFromCurrentImageContext();
-    }
-    UIGraphicsEndImageContext();
-    
-    if (times % 2 == 0)
-        effectImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return effectImage;
+  // Make sure we're not subclassed
+  if ([self class] != [RCBlurredImageView class])
+    return;
+  
+  // Set user interaction to NO
+  [self setUserInteractionEnabled:NO];
+  
+  // Set up regular image
+  _imageView = [[UIImageView alloc] initWithImage:_image];
+  [self addSubview:_imageView];
+  
+  // Set blurred image
+  _blurredImageView = [[UIImageView alloc] initWithImage:[self blurredImage]];
+  [_blurredImageView setAlpha:0.95f];
+  
+  if (_blurredImageView)
+    [self addSubview:_blurredImageView];
+  
+  NSLog(@"imageview frame = %@", NSStringFromCGRect(_imageView.frame));
+  NSLog(@"blurred frame = %@", NSStringFromCGRect(_blurredImageView.frame));
 }
 
-// Description: Returns a Gaussian blurred version of _image
-+ (UIImage *)blurredImage:(UIImage *)img
+
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+#pragma mark - Blur
+////////////////////////////////////////////////////////
+/*
+========================
+- (UIImage *)blurredImage
+Description: Returns a Gaussian blurred version of _image
+========================
+*/
+- (UIImage *)blurredImage
 {
-    return [RCBlurredImageView applyBlur:img radius:5 times:2];
+  // Make sure that we have an image to work with
+  if (!_image)
+    return nil;
+  
+  // Create context
+  CIContext *context = [CIContext contextWithOptions:nil];
+  
+  // Create an image
+  CIImage *image = [CIImage imageWithCGImage:_image.CGImage];
+  
+  // Set up a Gaussian Blur filter
+  CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
+  [blurFilter setValue:image forKey:kCIInputImageKey];
+    
+  // Get blurred image out
+  CIImage *blurredImage = [blurFilter valueForKey:kCIOutputImageKey];
+  
+  // Set up vignette filter
+  CIFilter *vignetteFilter = [CIFilter filterWithName:@"CIVignette"];
+  [vignetteFilter setValue:blurredImage forKey:kCIInputImageKey];
+  [vignetteFilter setValue:@(4.f) forKey:@"InputIntensity"];
+  
+  // get vignette & blurred image
+  CIImage *vignetteImage = [vignetteFilter valueForKey:kCIOutputImageKey];
+
+  CGFloat scale = [[UIScreen mainScreen] scale];
+  CGSize scaledSize = CGSizeMake(_image.size.width * scale, _image.size.height * scale);
+  CGImageRef imageRef = [context createCGImage:vignetteImage fromRect:(CGRect){CGPointZero, scaledSize}];
+  
+  return [UIImage imageWithCGImage:imageRef scale:[[UIScreen mainScreen] scale] orientation:UIImageOrientationUp];
 }
 
-// Description: Changes the opacity on the blurred image to change intensity
+/*
+========================
+- (void)setBlurIntensity
+Description: Changes the opacity on the blurred image to change intensity
+========================
+*/
 - (void)setBlurIntensity:(CGFloat)blurIntensity
 {
-    _blurIntensity = MAX(0.f,MIN(1.f,blurIntensity));
-    [_blurredImageView setAlpha:_blurIntensity];
+  if (blurIntensity < 0.f)
+    blurIntensity = 0.f;
+  else if (blurIntensity > 1.f)
+    blurIntensity = 1.f;
+  
+  _blurIntensity = blurIntensity;
+  
+  [_blurredImageView setAlpha:blurIntensity];
 }
 
+////////////////////////////////////////////////////////
 @end
