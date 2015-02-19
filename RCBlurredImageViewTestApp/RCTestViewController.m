@@ -51,6 +51,8 @@ CGFloat const kParallaxMax    = 10;   // our background can move 10 pixels up
   // Note that our image is 10px taller than the largest iPhone screen (568 + 10px), so we can have a parallax effect
   _blurredImageView = [[RCBlurredImageView alloc] initWithImage:[UIImage imageNamed:@"test.jpg"]];
   [_blurredImageView setBlurIntensity:0.f];
+  _blurredImageView.center = CGPointMake(_blurredImageView.bounds.size.width/2,
+                                         _blurredImageView.bounds.size.height/2);
   [self.view addSubview:_blurredImageView];
   
   // Set up our scrollview above the background
